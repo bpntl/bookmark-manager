@@ -1,5 +1,5 @@
 from contextlib import asynccontextmanager
-from datetime import datetime
+from datetime import UTC, datetime
 
 from fastapi import FastAPI, HTTPException, Query, status
 from rich import panel, print
@@ -45,7 +45,7 @@ def get_bookmark(session: SessionDep, bookmark_id: int):
     if not bookmark:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Bookmark with the given id doesn't exist."
+            detail="Bookmark with the given id doesn't exist"
         )
 
     return bookmark
@@ -55,7 +55,7 @@ def get_bookmark(session: SessionDep, bookmark_id: int):
 def create_bookmark(session: SessionDep, bookmark: BookmarkCreate):
     """Creates a new bookmark."""
 
-    current_timestamp = datetime.now() # noqa: DTZ005
+    current_timestamp = datetime.now(UTC)
     new_bookmark = Bookmark(
         **bookmark.model_dump(),
         status=BookmarkStatus.added,
@@ -83,7 +83,7 @@ def update_bookmark(session: SessionDep, bookmark_id: int, bookmark_update: Book
         )
 
     bookmark_update_data = bookmark_update.model_dump(exclude_unset=True)
-    bookmark_update_data.update({"date_modified": datetime.now()})  # noqa: DTZ005
+    bookmark_update_data.update({"date_modified": datetime.now(UTC)})
 
     bookmark.sqlmodel_update(bookmark_update_data)
 
